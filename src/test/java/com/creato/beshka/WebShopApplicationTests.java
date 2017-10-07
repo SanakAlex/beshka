@@ -1,4 +1,4 @@
-package com.devgroup.webshop;
+package com.creato.beshka;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
