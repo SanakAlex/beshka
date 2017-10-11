@@ -2,6 +2,7 @@ package com.creato.beshka.web.api;
 
 import com.creato.beshka.converters.View;
 import com.creato.beshka.converters.dto.ChatDto;
+import com.creato.beshka.converters.dto.MessageDto;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.services.IChatService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -39,6 +40,7 @@ public class ChatApiController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
+    @JsonView(View.WithMessages.class)
     public ChatDto createChat(@RequestBody ChatDto chatDto){
         return chatService.createChat(chatDto);
     }
@@ -51,6 +53,7 @@ public class ChatApiController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
+    @JsonView(View.WithMessages.class)
     public ChatDto updateChat(@RequestBody ChatDto chatDto) throws NoSuchEntityException {
         return chatService.updateChat(chatDto);
     }
@@ -59,6 +62,13 @@ public class ChatApiController {
     @ResponseStatus(HttpStatus.OK)
     public void deleteChat(@PathVariable Long id) throws NoSuchEntityException {
         chatService.deleteChat(id);
+    }
+
+    @RequestMapping(value = "/{id}/post", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @JsonView(View.WithMessages.class)
+    public MessageDto postMessage(@RequestBody MessageDto messageDto) throws NoSuchEntityException {
+        return chatService.postMessage(messageDto);
     }
 
 //    @RequestMapping(value = "{id}/messages", method = RequestMethod.GET)

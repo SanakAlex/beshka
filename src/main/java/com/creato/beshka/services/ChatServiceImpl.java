@@ -1,6 +1,7 @@
 package com.creato.beshka.services;
 
 import com.creato.beshka.converters.dto.ChatDto;
+import com.creato.beshka.converters.dto.MessageDto;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.persistence.dao.ChatRepository;
 import com.creato.beshka.persistence.dao.MessageRepository;
@@ -73,6 +74,13 @@ public class ChatServiceImpl implements IChatService {
         if (chatRepository.findOne(id) == null)
             throw new NoSuchEntityException(Chat.class.getName(), "chatId: " + id);
         chatRepository.delete(id);
+    }
+
+    @Override
+    public MessageDto postMessage(MessageDto messageDto) {
+        Message message = modelMapper.map(messageDto, Message.class);
+        Message createdMessage = messageRepository.save(message);
+        return modelMapper.map(createdMessage, MessageDto.class);
     }
 
     @Override

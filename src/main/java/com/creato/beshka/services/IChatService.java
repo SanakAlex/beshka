@@ -1,6 +1,7 @@
 package com.creato.beshka.services;
 
 import com.creato.beshka.converters.dto.ChatDto;
+import com.creato.beshka.converters.dto.MessageDto;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.persistence.entities.Chat;
 import com.creato.beshka.persistence.entities.Message;
@@ -23,4 +24,6 @@ public interface IChatService {
     List<Message> getChatsMessages(Long id);
 
     void deleteChat(Long id) throws NoSuchEntityException;
+
+    MessageDto postMessage(MessageDto messageDto);
 }
