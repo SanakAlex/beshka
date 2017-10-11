@@ -2,8 +2,8 @@ package com.creato.beshka.services;
 
 import com.creato.beshka.converters.dto.ChatDto;
 import com.creato.beshka.exceptions.NoSuchEntityException;
-import com.creato.beshka.persistence.dao.MessageRepository;
 import com.creato.beshka.persistence.dao.ChatRepository;
+import com.creato.beshka.persistence.dao.MessageRepository;
 import com.creato.beshka.persistence.entities.Chat;
 import com.creato.beshka.persistence.entities.Message;
 import org.modelmapper.ModelMapper;
@@ -39,14 +39,15 @@ public class ChatServiceImpl implements IChatService {
 
     @Override
     public List<ChatDto> getChatsByUserIn(PageRequest pageRequest) throws NoSuchEntityException {
-//        TODO add security auth of user
+//        TODO add security auth of user ZATICHKAAAAAA
 //        User user = new User();
 //        return chatRepository.findAllByMembersContains(user);
         Page<Chat> chats = chatRepository.findAll(pageRequest);
         if (chats == null || chats.getContent().isEmpty())
             throw new NoSuchEntityException(Chat.class.getName(), String.format("[offset: %d, limit: %d]", pageRequest.getOffset(), pageRequest.getPageSize()));
-        return chats.getContent().stream()
-                .map(chat -> modelMapper.map(chat, ChatDto.class))
+        List<ChatDto> chatDtos = chatRepository.getChatDtosWithLastMessage();
+        return chatDtos.stream()
+                .peek(chat -> chat.setUnread(messageRepository.getUnreadCount(chat.getChatId())))
                 .collect(Collectors.toList());
     }
 

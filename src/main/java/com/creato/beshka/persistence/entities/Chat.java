@@ -1,13 +1,10 @@
 package com.creato.beshka.persistence.entities;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
@@ -18,8 +15,8 @@ public class Chat {
     private Long chatId;
     private String chatTitle;
 
-//    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-//    private List<Message> messages = new LinkedList<>();
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private List<Message> messages = new LinkedList<>();
 
 //    @ManyToMany
 //    @JoinTable(

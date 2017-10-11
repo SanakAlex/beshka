@@ -32,7 +32,7 @@ public class UsersApiController {
         userService.addUser(user);
     }
 
-    @RequestMapping(value = "/{id}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }

@@ -1,6 +1,5 @@
 package com.creato.beshka.persistence.entities;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,15 +12,14 @@ public class Message {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long messageId;
     private String content;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+    private Timestamp createdAt;
+    private boolean read;
 
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name="senderId")
 //    private User sender;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name="chatId")
-//    @JsonIgnore
-//    private Chat chat;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="chatId")
+    private Chat chat;
 }

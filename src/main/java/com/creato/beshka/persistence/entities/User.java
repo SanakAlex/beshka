@@ -1,11 +1,8 @@
 package com.creato.beshka.persistence.entities;
 
-import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Entity
@@ -20,6 +17,10 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
+
+    public User(Long userId) {
+        this.userId = userId;
+    }
 
 //    @ManyToMany(mappedBy = "members")
 //    @JsonIgnore
