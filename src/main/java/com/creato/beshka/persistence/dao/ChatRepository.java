@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 //    List<Chat> findAllByMembersIn(User user);
-    @Query("select new com.creato.beshka.converters.dto.ChatDto(c.chatId, c.chatTitle, m.messageId, m.content, m.createdAt, m.read)" +
+    @Query("select new com.creato.beshka.converters.dto.ChatDto" +
+            "(c.chatId, c.chatTitle, m)" +
 //            "from User u " +
             "from Chat c " +
             "left outer join c.messages m " +

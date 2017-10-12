@@ -15,9 +15,9 @@ public class Message {
     private Timestamp createdAt;
     private boolean read;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name="senderId")
-//    private User sender;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="senderId")
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="chatId")
