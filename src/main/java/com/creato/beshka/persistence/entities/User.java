@@ -7,14 +7,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Entity
 @Table(name = "\"user\"")
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -24,15 +22,13 @@ public class User {
     private boolean active;
     private String firstName;
     private String lastName;
-    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
-    private Set<Chat> chats = new HashSet<>();
-
     private String password;
+
+//    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+//    private Set<Chat> chats = new HashSet<>();
 
     public void setPassword(String password) {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         this.password = encoder.encode(password);
     }
-
-
 }
