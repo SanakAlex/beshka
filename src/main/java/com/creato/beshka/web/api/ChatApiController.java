@@ -3,11 +3,11 @@ package com.creato.beshka.web.api;
 import com.creato.beshka.converters.View;
 import com.creato.beshka.converters.dto.ChatDto;
 import com.creato.beshka.converters.dto.MessageDto;
+import com.creato.beshka.exceptions.InputErrorException;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.services.IChatService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,29 +19,24 @@ public class ChatApiController {
 
     private final IChatService chatService;
 
-
     @Autowired
     public ChatApiController(IChatService chatService) {
         this.chatService = chatService;
     }
 
-    /**
-     * offset number of rows to skip
-     * limit max on request
-     */
     @RequestMapping(method = RequestMethod.GET)
     @JsonView(View.WithoutMessages.class)
     public List<ChatDto> getAllChatsByUserIn(
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit
     ) throws NoSuchEntityException {
-        return chatService.getChatsByUserIn(new PageRequest(offset/limit, limit));
+        return chatService.getChatsByUserIn(offset, limit);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @JsonView(View.WithMessages.class)
-    public ChatDto createChat(@RequestBody ChatDto chatDto){
+    public ChatDto createChat(@RequestBody ChatDto chatDto) throws InputErrorException {
         return chatService.createChat(chatDto);
     }
 
@@ -67,7 +62,7 @@ public class ChatApiController {
     @RequestMapping(value = "/{id}/post", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @JsonView(View.WithMessages.class)
-    public MessageDto postMessage(@RequestBody MessageDto messageDto) throws NoSuchEntityException {
+    public MessageDto postMessage(@RequestBody MessageDto messageDto) throws NoSuchEntityException, InputErrorException {
         return chatService.postMessage(messageDto);
     }
 

@@ -1,14 +1,14 @@
 package com.creato.beshka.web.api;
 
 import com.creato.beshka.converters.View;
-import com.creato.beshka.persistence.entities.User;
+import com.creato.beshka.converters.dto.UserDto;
+import com.creato.beshka.exceptions.EmailExistsException;
+import com.creato.beshka.exceptions.NoSuchEntityException;
+import com.creato.beshka.exceptions.ServiceErrorException;
 import com.creato.beshka.services.IUserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,20 +25,23 @@ public class UsersApiController {
 
     @JsonView(View.Public.class)
     @RequestMapping(method = RequestMethod.GET)
-    public List<User> getAllActiveUsers(){
-        return userService.getAllActiveUsers();
+    public List<UserDto> getAllActiveUsers(
+            @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
+            @RequestParam(value = "limit", required = false, defaultValue = "10") int limit
+    ) throws NoSuchEntityException {
+        return userService.getAllActiveUsers(offset, limit);
     }
 
     @JsonView(View.Public.class)
     @RequestMapping(method = RequestMethod.POST)
-    public void createUser(@RequestBody User user){
-        userService.addUser(user);
+    public void createUser(@RequestBody UserDto userDto) throws EmailExistsException, ServiceErrorException {
+        userService.addUser(userDto);
     }
 
     @JsonView(View.Public.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    public UserDto updateUser(@RequestBody UserDto userDto) throws NoSuchEntityException {
+        return userService.updateUser(userDto);
     }
 
 }

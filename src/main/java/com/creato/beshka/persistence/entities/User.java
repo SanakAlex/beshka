@@ -3,9 +3,12 @@ package com.creato.beshka.persistence.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -18,17 +21,18 @@ public class User {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long userId;
     private String email;
-    @NonNull
-    private boolean active = true;
+    private boolean active;
     private String firstName;
     private String lastName;
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private Set<Chat> chats = new HashSet<>();
+
     private String password;
 
-    public User(Long userId) {
-        this.userId = userId;
+    public void setPassword(String password) {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(password);
     }
 
-//    @ManyToMany(mappedBy = "members")
-//    @JsonIgnore
-//    private Set<Chat> chats = new HashSet<>();
+
 }

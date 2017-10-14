@@ -9,6 +9,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class AppException extends Exception {
+
     private int code;
 
     AppException() {

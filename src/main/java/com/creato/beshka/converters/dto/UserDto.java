@@ -2,6 +2,7 @@ package com.creato.beshka.converters.dto;
 
 import com.creato.beshka.converters.View;
 import com.creato.beshka.persistence.entities.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,14 +16,15 @@ public class UserDto {
 
     private Long userId;
     private String firstName;
-
     private String lastName;
     @JsonView(value = View.Private.class)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String email;
     @JsonView(value = View.Private.class)
     @NonNull
     private boolean active = true;
     @JsonView(value = View.Private.class)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     UserDto(User user) {

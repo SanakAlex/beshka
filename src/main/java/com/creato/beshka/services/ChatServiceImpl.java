@@ -2,6 +2,7 @@ package com.creato.beshka.services;
 
 import com.creato.beshka.converters.dto.ChatDto;
 import com.creato.beshka.converters.dto.MessageDto;
+import com.creato.beshka.exceptions.InputErrorException;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.persistence.dao.ChatRepository;
 import com.creato.beshka.persistence.dao.MessageRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,45 +33,56 @@ public class ChatServiceImpl implements IChatService {
     }
 
     @Override
+    @Transactional
     public ChatDto getChatById(Long id) throws NoSuchEntityException {
         Chat chat = chatRepository.findOne(id);
         if (chat == null)
-            throw new NoSuchEntityException("chat", "id: " + id);
+            throw new NoSuchEntityException(Chat.class.getName(), "id: " + id);
         return modelMapper.map(chat, ChatDto.class);
     }
 
+    /**
+     * offset number of rows to skip
+     * limit max on request
+     */
     @Override
-    public List<ChatDto> getChatsByUserIn(PageRequest pageRequest) throws NoSuchEntityException {
+    @Transactional
+    public List<ChatDto> getChatsByUserIn(int offset, int limit) throws NoSuchEntityException {
 //        TODO add security auth of user ZATICHKAAAAAA
 //        User user = new User();
 //        return chatRepository.findAllByMembersContains(user);
-        Page<Chat> chats = chatRepository.findAll(pageRequest);
-        if (chats == null || chats.getContent().isEmpty())
-            throw new NoSuchEntityException(Chat.class.getName(), String.format("[offset: %d, limit: %d]", pageRequest.getOffset(), pageRequest.getPageSize()));
-        List<ChatDto> chatDtos = chatRepository.getChatDtosWithLastMessage();
-        return chatDtos.stream()
+        Page<ChatDto> chatDtos = chatRepository.getChatDtosWithLastMessage(new PageRequest(offset/limit, limit));
+        if (chatDtos == null || chatDtos.getContent().isEmpty())
+            throw new NoSuchEntityException(Chat.class.getName(), String.format("[offset: %d, limit: %d]", offset, limit));
+        chatRepository.findAll(new PageRequest(offset/limit, limit));
+        return chatDtos.getContent().stream()
                 .peek(chat -> chat.setUnread(messageRepository.getUnreadCount(chat.getChatId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ChatDto createChat(ChatDto chatDto) {
+    @Transactional
+    public ChatDto createChat(ChatDto chatDto) throws InputErrorException {
+        if (chatRepository.findOne(chatDto.getChatId()) != null || chatDto.getChatId() == null)
+            throw new InputErrorException(Chat.class.getName(), "chatId");
         Chat chat = modelMapper.map(chatDto, Chat.class);
         Chat createdChat = chatRepository.save(chat);
         return modelMapper.map(createdChat, ChatDto.class);
     }
 
     @Override
+    @Transactional(rollbackFor=NoSuchEntityException.class)
     public ChatDto updateChat(ChatDto chatDto) throws NoSuchEntityException {
 //        TODO check if a member of chat or admin
-        if (chatRepository.findOne(chatDto.getChatId()) == null)
+        if (chatRepository.findOne(chatDto.getChatId()) == null || chatDto.getChatId() == null)
             throw new NoSuchEntityException(Chat.class.getName(), "chatId: " + chatDto.getChatId());
         Chat chat = modelMapper.map(chatDto, Chat.class);
-        Chat updatedChat = chatRepository.save(chat);
+        Chat updatedChat = chatRepository.saveAndFlush(chat);
         return modelMapper.map(updatedChat, ChatDto.class);
     }
 
     @Override
+    @Transactional
     public void deleteChat(Long id)  throws NoSuchEntityException{
         if (chatRepository.findOne(id) == null)
             throw new NoSuchEntityException(Chat.class.getName(), "chatId: " + id);
@@ -77,9 +90,14 @@ public class ChatServiceImpl implements IChatService {
     }
 
     @Override
-    public MessageDto postMessage(MessageDto messageDto) {
+    @Transactional
+    public MessageDto postMessage(MessageDto messageDto) throws InputErrorException, NoSuchEntityException {
+        if (messageDto.getMessageId() != 0)
+            throw new InputErrorException(Message.class.getName(), "messageId");
+        if (chatRepository.findOne(messageDto.getChat().getChatId()) == null)
+            throw new NoSuchEntityException(Chat.class.getName(), "chatId:" + messageDto.getChat().getChatId());
         Message message = modelMapper.map(messageDto, Message.class);
-        Message createdMessage = messageRepository.save(message);
+        Message createdMessage = messageRepository.saveAndFlush(message);
         return modelMapper.map(createdMessage, MessageDto.class);
     }
 
@@ -90,11 +108,4 @@ public class ChatServiceImpl implements IChatService {
 //                filter(chat-> chat.getMembers().stream().
 //                        anyMatch(user->user.getUserId().equals(id))).findFirst().get();
     }
-
-    @Override
-    public List<Message> getChatsMessages(Long id) {
-//        return messageRepository.findAllByChat_ChatId(id);
-        return null;
-    }
-
 }
