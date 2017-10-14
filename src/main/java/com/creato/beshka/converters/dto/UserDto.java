@@ -38,4 +38,33 @@ public class UserDto {
         super();
         this.active = true;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        UserDto userDto = (UserDto) o;
+
+        if (active != userDto.active) return false;
+        if (userId != null ? !userId.equals(userDto.userId) : userDto.userId != null) return false;
+        if (firstName != null ? !firstName.equals(userDto.firstName) : userDto.firstName != null) return false;
+        if (lastName != null ? !lastName.equals(userDto.lastName) : userDto.lastName != null) return false;
+        if (email != null ? !email.equals(userDto.email) : userDto.email != null) return false;
+        if (password != null ? !password.equals(userDto.password) : userDto.password != null) return false;
+        return chats != null ? chats.equals(userDto.chats) : userDto.chats == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (active ? 1 : 0);
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        return result;
+    }
 }

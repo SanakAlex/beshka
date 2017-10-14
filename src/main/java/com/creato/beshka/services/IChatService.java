@@ -18,6 +18,8 @@ public interface IChatService {
 
     ChatDto updateChat(ChatDto chatDto) throws NoSuchEntityException;
 
+    void readMessages(Long id);
+
     Chat getChatByMember(Long id);
 
     void deleteChat(Long id) throws NoSuchEntityException;

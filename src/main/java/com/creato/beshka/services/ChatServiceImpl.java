@@ -102,6 +102,15 @@ public class ChatServiceImpl implements IChatService {
     }
 
     @Override
+    public void readMessages(Long id) {
+        List<Message> messages = messageRepository.findByReadIsFalseAndChat_ChatId(id);
+        messages.forEach(message -> {
+            message.setRead(true);
+            messageRepository.save(message);
+        });
+    }
+
+    @Override
     public Chat getChatByMember(Long id) {
         return null;
 //        return chatsOfCurrentUser.stream().
