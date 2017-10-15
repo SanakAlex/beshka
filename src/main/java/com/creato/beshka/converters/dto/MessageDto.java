@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -15,12 +14,10 @@ import java.sql.Timestamp;
 public class MessageDto {
     private Long messageId;
     private String content;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
-    @NonNull
-    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-    @NonNull
-    private boolean read = false;
-    @NonNull
+//    TODO solve timezone problem
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss", timezone = "GMT+3")
+    private Timestamp createdAt;
+    private boolean read;
     private UserDto sender;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

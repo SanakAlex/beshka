@@ -1,6 +1,5 @@
 package com.creato.beshka.persistence.entities;
 
-import com.creato.beshka.converters.dto.MessageDto;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,6 +22,11 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="chatId")
     private Chat chat;
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt == null ? new Timestamp(System.currentTimeMillis()) : createdAt;
+        System.out.println(new Timestamp(System.currentTimeMillis()));
+    }
 
     @Override
     public boolean equals(Object o) {

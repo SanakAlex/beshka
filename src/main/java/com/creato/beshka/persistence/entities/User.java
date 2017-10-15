@@ -30,8 +30,11 @@ public class User {
     private Set<Chat> chats = new HashSet<>();
 
     public void setPassword(String password) {
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-        this.password = encoder.encode(password);
+        if (password != null) {
+            PasswordEncoder encoder = new BCryptPasswordEncoder();
+            this.password = encoder.encode(password);
+        } else
+            this.password = null;
     }
 
     @Override

@@ -63,7 +63,7 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional
     public ChatDto createChat(ChatDto chatDto) throws InputErrorException {
-        if (chatRepository.findOne(chatDto.getChatId()) != null || chatDto.getChatId() == null)
+        if (chatDto.getChatId() != null)
             throw new InputErrorException(Chat.class.getName(), "chatId");
         Chat chat = modelMapper.map(chatDto, Chat.class);
         Chat createdChat = chatRepository.save(chat);
@@ -92,7 +92,7 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional
     public MessageDto postMessage(MessageDto messageDto) throws InputErrorException, NoSuchEntityException {
-        if (messageDto.getMessageId() != 0)
+        if (messageDto.getMessageId() != null)
             throw new InputErrorException(Message.class.getName(), "messageId");
         if (chatRepository.findOne(messageDto.getChat().getChatId()) == null)
             throw new NoSuchEntityException(Chat.class.getName(), "chatId:" + messageDto.getChat().getChatId());
