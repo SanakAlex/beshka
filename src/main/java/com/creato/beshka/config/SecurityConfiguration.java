@@ -45,21 +45,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         http
                 .csrf().disable()
                 .authorizeRequests()
-                    .antMatchers("/", "/static/**", "/favicon.ico").permitAll();
-//                    .antMatchers("/api/**").authenticated();
-//                .and()
-//                    .formLogin()
-//                        .loginPage("/")
-//                        .usernameParameter("username")
-//                        .passwordParameter("password")
-//                        .permitAll()
-//                .and()
-//                    .logout()
-//                        .logoutUrl("/logout").permitAll()
-//                        .logoutSuccessUrl("/")
-//                        .deleteCookies("JSESSIONID")
-//                .and()
-//                    .rememberMe();
+                    .antMatchers("/", "/static/**", "/favicon.ico").permitAll()
+                    .antMatchers("/api/**").permitAll()/*.authenticated()*/
+                .and()
+                    .cors()
+                .and()
+                    .formLogin()
+                        .loginPage("/")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .permitAll()
+                .and()
+                    .logout()
+                        .logoutUrl("/logout").permitAll()
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID")
+                .and()
+                    .rememberMe();
     }
 
     @Bean
