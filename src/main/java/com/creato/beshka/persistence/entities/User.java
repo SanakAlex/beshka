@@ -25,6 +25,8 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
+    private String avatarUrlThumbnail;
+    private String avatarUrlLarge;
 
     @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
     private Set<Chat> chats = new HashSet<>();
@@ -51,6 +53,10 @@ public class User {
         if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
         if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
         if (password != null ? !password.equals(user.password) : user.password != null) return false;
+        if (avatarUrlThumbnail != null ? !avatarUrlThumbnail.equals(user.avatarUrlThumbnail) : user.avatarUrlThumbnail != null)
+            return false;
+        if (avatarUrlLarge != null ? !avatarUrlLarge.equals(user.avatarUrlLarge) : user.avatarUrlLarge != null)
+            return false;
         return chats != null ? chats.equals(user.chats) : user.chats == null;
     }
 
@@ -63,6 +69,8 @@ public class User {
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (avatarUrlThumbnail != null ? avatarUrlThumbnail.hashCode() : 0);
+        result = 31 * result + (avatarUrlLarge != null ? avatarUrlLarge.hashCode() : 0);
         return result;
     }
 }
