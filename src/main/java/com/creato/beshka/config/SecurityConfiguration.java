@@ -8,13 +8,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
     private final UserRepository userRepository;
@@ -46,12 +47,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .csrf().disable()
                 .authorizeRequests()
                     .antMatchers("/", "/static/**", "/favicon.ico").permitAll()
-                    .antMatchers("/api/**").permitAll()/*.authenticated()*/
+                    .antMatchers("/api/**").authenticated()/*.permitAll()*/
                 .and()
                     .cors()
                 .and()
+                    .httpBasic()
+                .and()
                     .formLogin()
-                        .loginPage("/")
+//                        .loginPage("/")
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .permitAll()
