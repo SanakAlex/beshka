@@ -2,6 +2,7 @@ package com.creato.beshka.converters.dto;
 
 import com.creato.beshka.converters.View;
 import com.creato.beshka.persistence.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
@@ -17,9 +18,9 @@ public class UserDto {
     private String lastName;
     private String avatarUrlThumbnail;
     private String avatarUrlLarge;
-    
-    @JsonView(value = View.WithoutMessages.class)
-    private Set<ChatDto> chatDtoSet;
+
+    @JsonIgnore
+    private int readCount;
 
     @JsonView(value = View.Private.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -33,17 +34,17 @@ public class UserDto {
     @JsonView(value = View.Private.class)
     private Set<ChatDto> chats = new HashSet<>();
 
-    UserDto(User user) {
+    public UserDto() {
+        super();
+        this.active = true;
+    }
+
+    public UserDto(User user) {
         this.userId = user.getUserId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.avatarUrlLarge = user.getAvatarUrlLarge();
         this.avatarUrlThumbnail = user.getAvatarUrlThumbnail();
-    }
-
-    public UserDto() {
-        super();
-        this.active = true;
     }
 
     @Override

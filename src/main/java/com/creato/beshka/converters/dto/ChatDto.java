@@ -1,7 +1,7 @@
 package com.creato.beshka.converters.dto;
 
 import com.creato.beshka.converters.View;
-import com.creato.beshka.persistence.entities.Message;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,25 +16,27 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatDto {
+
     private Long chatId;
     private String chatTitle;
 
     @JsonView(View.WithMessages.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<MessageDto> messages = new LinkedList<>();
-    @JsonView(View.WithMessages.class)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<UserDto> members = new HashSet<>();
 
     @JsonView(View.WithoutMessages.class)
     private MessageDto lastMessage;
     @JsonView(View.WithoutMessages.class)
     private int unread;
-
-    public ChatDto(long chatId, String chatTitle, Message message){
-        this.chatId = chatId;
-        this.chatTitle = chatTitle;
-        this.lastMessage = new MessageDto
-                (message.getMessageId(), message.getContent(), message.getCreatedAt(), message.isRead(),
-                        new UserDto(message.getSender()));
-        this.unread = 0;
-    }
+//
+//    public ChatDto(Chat chat, Message message){
+//        this.chatId = chat.getChatId();
+//        this.chatTitle = chat.getChatTitle();
+//        this.lastMessage = new MessageDto
+//                (message.getMessageId(), message.getContent(), message.getCreatedAt(), message.isRead(),
+//                        new UserDto(message.getSender()));
+//        this.unread = 0;
+//    }
 }

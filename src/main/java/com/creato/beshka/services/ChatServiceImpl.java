@@ -8,6 +8,7 @@ import com.creato.beshka.persistence.dao.ChatRepository;
 import com.creato.beshka.persistence.dao.MessageRepository;
 import com.creato.beshka.persistence.entities.Chat;
 import com.creato.beshka.persistence.entities.Message;
+import com.creato.beshka.persistence.entities.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,12 +25,14 @@ public class ChatServiceImpl implements IChatService {
     private final ModelMapper modelMapper;
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
+    private final SessionUtils sessionUtils;
 
     @Autowired
-    public ChatServiceImpl(ModelMapper modelMapper, ChatRepository chatRepository, MessageRepository messageRepository) {
+    public ChatServiceImpl(ModelMapper modelMapper, ChatRepository chatRepository, MessageRepository messageRepository, SessionUtils sessionUtils) {
         this.modelMapper = modelMapper;
         this.chatRepository = chatRepository;
         this.messageRepository = messageRepository;
+        this.sessionUtils = sessionUtils;
     }
 
     @Override
@@ -48,15 +51,14 @@ public class ChatServiceImpl implements IChatService {
     @Override
     @Transactional
     public List<ChatDto> getChatsByUserIn(int offset, int limit) throws NoSuchEntityException {
-//        TODO add security auth of user ZATICHKAAAAAA
-//        User user = new User();
-//        return chatRepository.findAllByMembersContains(user);
-        Page<ChatDto> chatDtos = chatRepository.getChatDtosWithLastMessage(new PageRequest(offset/limit, limit));
-        if (chatDtos == null || chatDtos.getContent().isEmpty())
+        PageRequest pageRequest = new PageRequest(offset/limit, limit);
+        User currentUser = sessionUtils.getCurrentUser();
+        Page<Chat> chats = chatRepository.getChatWithLastMessage(pageRequest, currentUser);
+
+        if (chats == null || chats.getContent().isEmpty())
             throw new NoSuchEntityException(Chat.class.getName(), String.format("[offset: %d, limit: %d]", offset, limit));
-        chatRepository.findAll(new PageRequest(offset/limit, limit));
-        return chatDtos.getContent().stream()
-                .peek(chat -> chat.setUnread(messageRepository.getUnreadCount(chat.getChatId())))
+        return chats.getContent().stream()
+                .map(this::getChatDtoWithLastMessage)
                 .collect(Collectors.toList());
     }
 
@@ -102,6 +104,7 @@ public class ChatServiceImpl implements IChatService {
     }
 
     @Override
+    @Transactional
     public void readMessages(Long id) {
         List<Message> messages = messageRepository.findByReadIsFalseAndChat_ChatId(id);
         messages.forEach(message -> {
@@ -116,5 +119,14 @@ public class ChatServiceImpl implements IChatService {
 //        return chatsOfCurrentUser.stream().
 //                filter(chat-> chat.getMembers().stream().
 //                        anyMatch(user->user.getUserId().equals(id))).findFirst().get();
+    }
+
+    @Override
+    public ChatDto getChatDtoWithLastMessage(Chat chat) {
+        ChatDto chatDto = modelMapper.map(chat, ChatDto.class);
+        Message lastMessage = chat.getMessages().get(chat.getMessages().size() - 1);
+        chatDto.setLastMessage(modelMapper.map(lastMessage, MessageDto.class));
+        chatDto.setUnread(messageRepository.getUnreadCount(chat.getChatId()));
+        return chatDto;
     }
 }

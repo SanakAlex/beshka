@@ -25,4 +25,6 @@ public interface IChatService {
     void deleteChat(Long id) throws NoSuchEntityException;
 
     MessageDto postMessage(MessageDto messageDto) throws InputErrorException, NoSuchEntityException;
+
+    ChatDto getChatDtoWithLastMessage(Chat chat);
 }
