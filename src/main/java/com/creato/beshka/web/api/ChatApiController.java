@@ -3,6 +3,7 @@ package com.creato.beshka.web.api;
 import com.creato.beshka.converters.View;
 import com.creato.beshka.converters.dto.ChatDto;
 import com.creato.beshka.converters.dto.MessageDto;
+import com.creato.beshka.exceptions.AuthRequiredException;
 import com.creato.beshka.exceptions.InputErrorException;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.services.IChatService;
@@ -30,8 +31,8 @@ public class ChatApiController {
     public List<ChatDto> getAllChatsByUserIn(
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit
-    ) throws NoSuchEntityException {
-        return chatService.getChatsByUserIn(offset, limit);
+    ) throws NoSuchEntityException, AuthRequiredException {
+        return chatService.getChatsOfCurrentUser(offset, limit);
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -67,16 +68,15 @@ public class ChatApiController {
         return chatService.postMessage(messageDto);
     }
 
-//    @RequestMapping(value = "{id}/messages", method = RequestMethod.GET)
-//    public ChatDto getChatsMessages(@PathVariable Long id) {
-//        return chatService.getChatsMessages(id);
-//        return null;
-//    }
+    @RequestMapping(value = "/{id}/read", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public void readMessagesInChat(@PathVariable Long id) throws AuthRequiredException, NoSuchEntityException {
+        chatService.readMessages(id);
+    }
 
-//    @RequestMapping(value = "writeTo/{id}", method = RequestMethod.GET)
-//    public ChatDto writeToUser(@PathVariable Long id){
-//        return chatService.getChatByMember(id);
-//    }
-//
-
+    @RequestMapping(value = "/withUser/{id}")
+    @JsonView(View.WithMessages.class)
+    public ChatDto getChatWithUser(@PathVariable Long id) throws NoSuchEntityException, AuthRequiredException {
+        return chatService.getChatWithUser(id);
+    }
 }

@@ -23,14 +23,6 @@ public class MessageDto {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private ChatDto chat;
 
-    MessageDto(Long messageId, String content, Timestamp createdAt, boolean read, UserDto sender) {
-        this.messageId = messageId;
-        this.content = content;
-        this.createdAt = createdAt;
-        this.read = read;
-        this.sender = sender;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

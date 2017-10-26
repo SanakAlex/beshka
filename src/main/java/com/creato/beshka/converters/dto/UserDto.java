@@ -2,7 +2,6 @@ package com.creato.beshka.converters.dto;
 
 import com.creato.beshka.converters.View;
 import com.creato.beshka.persistence.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
@@ -18,9 +17,6 @@ public class UserDto {
     private String lastName;
     private String avatarUrlThumbnail;
     private String avatarUrlLarge;
-
-    @JsonIgnore
-    private int readCount;
 
     @JsonView(value = View.Private.class)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

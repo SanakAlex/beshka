@@ -27,23 +27,24 @@ public class SessionUtils {
         put("moderator", new SimpleGrantedAuthority("ROLE_MODERATOR"));
         put("user",   new SimpleGrantedAuthority("ROLE_USER"));
     }};
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public User getCurrentUser() {
+    @Autowired
+    public SessionUtils(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    User getCurrentUser() throws AuthRequiredException {
         if (isAuthorized()) {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userRepository.findByEmail(userDetails.getUsername());
         } else
-            return null;
+            throw new AuthRequiredException();
     }
 
-    public boolean isAuthorized() {
+    private boolean isAuthorized() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken))
-            return true;
-        else
-            return false;
+        return !(authentication instanceof AnonymousAuthenticationToken);
     }
 
     public void authorized() throws AuthRequiredException {

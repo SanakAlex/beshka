@@ -30,13 +30,4 @@ public class ChatDto {
     private MessageDto lastMessage;
     @JsonView(View.WithoutMessages.class)
     private int unread;
-//
-//    public ChatDto(Chat chat, Message message){
-//        this.chatId = chat.getChatId();
-//        this.chatTitle = chat.getChatTitle();
-//        this.lastMessage = new MessageDto
-//                (message.getMessageId(), message.getContent(), message.getCreatedAt(), message.isRead(),
-//                        new UserDto(message.getSender()));
-//        this.unread = 0;
-//    }
 }

@@ -2,6 +2,7 @@ package com.creato.beshka.web.api;
 
 import com.creato.beshka.converters.View;
 import com.creato.beshka.converters.dto.UserDto;
+import com.creato.beshka.exceptions.AuthRequiredException;
 import com.creato.beshka.exceptions.EmailExistsException;
 import com.creato.beshka.exceptions.NoSuchEntityException;
 import com.creato.beshka.exceptions.ServiceErrorException;
@@ -43,6 +44,12 @@ public class UsersApiController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public UserDto updateUser(@RequestBody UserDto userDto) throws NoSuchEntityException {
         return userService.updateUser(userDto);
+    }
+
+    @JsonView(View.Public.class)
+    @RequestMapping(value = "/getCurrent", method = RequestMethod.GET)
+    public UserDto getCurrentUser() throws AuthRequiredException {
+        return userService.getCurrentUser();
     }
 
 }
