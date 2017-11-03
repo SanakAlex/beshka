@@ -102,7 +102,7 @@ public class ChatApiController {
         }
     }
 
-    @SubscribeMapping("/{id}")
+    @SubscribeMapping("/queue/chats/{id}")
     @JsonView(View.WithMessages.class)
     public void getChatWS(@DestinationVariable("id") Long chatId, Principal principal)
             throws NoSuchEntityException, InputErrorException {
@@ -110,7 +110,7 @@ public class ChatApiController {
         template.convertAndSendToUser(principal.getName(), "/queue/chats/" + chatId, chatDto);
     }
 
-    @SubscribeMapping
+    @SubscribeMapping("/queue/chats")
     @JsonView(View.WithoutMessages.class)
     public void getChatsWS(
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
