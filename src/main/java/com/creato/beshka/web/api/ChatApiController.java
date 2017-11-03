@@ -19,7 +19,11 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.springframework.messaging.core.AbstractMessageSendingTemplate.CONVERSION_HINT_HEADER;
 
 @CrossOrigin
 @RestController
@@ -90,34 +94,44 @@ public class ChatApiController {
     }
 
     @MessageMapping("/{id}/post")
-    @JsonView(View.WithoutMessages.class)
+//    @JsonView(View.WithoutMessages.class)
     public void send(@DestinationVariable("id") Long chatId, @Payload MessageDto messageDto)
             throws NoSuchEntityException, InputErrorException {
         MessageDto newMessageDto = chatService.postMessage(messageDto);
-        template.convertAndSend("/queue/chats/" + chatId, newMessageDto);
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(CONVERSION_HINT_HEADER, View.WithoutMessages.class);
+
+        template.convertAndSend("/queue/chats/" + chatId, newMessageDto, headers);
         ChatDto chatDto = chatService.getChatById(chatId);
         for (UserDto user: chatDto.getMembers()
              ) {
-            template.convertAndSendToUser(user.getEmail(), "/queue/chats", chatDto);
+            template.convertAndSendToUser(user.getEmail(), "/queue/chats", chatDto, headers);
         }
     }
 
     @SubscribeMapping("/queue/chats/{id}")
-    @JsonView(View.WithMessages.class)
+//    @JsonView(View.WithMessages.class)
     public void getChatWS(@DestinationVariable("id") Long chatId, Principal principal)
             throws NoSuchEntityException, InputErrorException {
         ChatDto chatDto =  chatService.getChatById(chatId);
-        template.convertAndSendToUser(principal.getName(), "/queue/chats/" + chatId, chatDto);
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(CONVERSION_HINT_HEADER, View.WithMessages.class);
+        template.convertAndSendToUser(principal.getName(), "/queue/chats/" + chatId, chatDto, headers);
     }
 
     @SubscribeMapping("/queue/chats")
-    @JsonView(View.WithoutMessages.class)
+//    @JsonView(View.WithoutMessages.class)
     public void getChatsWS(
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
             @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
             Principal principal
     ) throws NoSuchEntityException, AuthRequiredException {
         List<ChatDto> chatDtos = chatService.getChatsOfCurrentUser(offset, limit);
-        template.convertAndSendToUser(principal.getName(), "/queue/chats", chatDtos);
+
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(CONVERSION_HINT_HEADER, View.WithoutMessages.class);
+
+        template.convertAndSendToUser(principal.getName(), "/queue/chats", chatDtos, headers);
     }
 }
