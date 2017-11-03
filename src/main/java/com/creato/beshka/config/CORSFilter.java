@@ -8,34 +8,44 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CORSFilter implements Filter {
 
-    public CORSFilter() {
-        super();
-    }
+    // This is to be replaced with a list of domains allowed to access the server
+    //You can include more than one origin here
+    private final List<String> allowedOrigins = Arrays.asList("http://localhost:4200", "*", "http://localhost:8080");
 
     @Override
-    public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain) throws IOException, ServletException {
-        final HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin", "*");
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        // Lets make sure that we are working with HTTP (that is, against HttpServletRequest and HttpServletResponse objects)
+        if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
+            HttpServletRequest request = (HttpServletRequest) req;
+            HttpServletResponse response = (HttpServletResponse) res;
 
-        // without this header jquery.ajax calls returns 401 even after successful login and SSESSIONID being succesfully stored.
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+            // Access-Control-Allow-Origin
+            String origin = request.getHeader("Origin");
+            response.setHeader("Access-Control-Allow-Origin", allowedOrigins.contains(origin) ? origin : "");
+            response.setHeader("Vary", "Origin");
 
-        response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Authorization, Origin, Content-Type, Version");
-        response.setHeader("Access-Control-Expose-Headers", "X-Requested-With, Authorization, Origin, Content-Type");
+            // Access-Control-Max-Age
+            response.setHeader("Access-Control-Max-Age", "3600");
 
-        final HttpServletRequest request = (HttpServletRequest) req;
-        if (!request.getMethod().equals("OPTIONS")) {
-            chain.doFilter(req, res);
-        } else {
-            // do not continue with filter chain for options requests
+            // Access-Control-Allow-Credentials
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+
+            // Access-Control-Allow-Methods
+            response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+
+            // Access-Control-Allow-Headers
+            response.setHeader("Access-Control-Allow-Headers",
+                    "Origin, X-Requested-With, Content-Type, Accept, " + "X-CSRF-TOKEN");
         }
+
+        chain.doFilter(req, res);
     }
 
     @Override

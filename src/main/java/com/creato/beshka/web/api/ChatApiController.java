@@ -110,6 +110,17 @@ public class ChatApiController {
         }
     }
 
+    @MessageMapping("/{id}/read")
+    public void read(@DestinationVariable("id") Long chatId)
+            throws NoSuchEntityException, InputErrorException, AuthRequiredException {
+        chatService.readMessages(chatId);
+        ChatDto chatDto = chatService.getChatById(chatId);
+        for (UserDto user: chatDto.getMembers()
+                ) {
+            template.convertAndSendToUser(user.getEmail(), "/queue/chats", chatDto);
+        }
+    }
+
     @SubscribeMapping("/queue/chats/{id}")
 //    @JsonView(View.WithMessages.class)
     public void getChatWS(@DestinationVariable("id") Long chatId, Principal principal)
