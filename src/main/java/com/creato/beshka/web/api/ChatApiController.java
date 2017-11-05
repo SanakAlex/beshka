@@ -93,7 +93,7 @@ public class ChatApiController {
         return chatService.getChatWithUser(id);
     }
 
-    @MessageMapping("/{id}/post")
+    @MessageMapping("/chats/{id}/post")
 //    @JsonView(View.WithoutMessages.class)
     public void send(@DestinationVariable("id") Long chatId, @Payload MessageDto messageDto)
             throws NoSuchEntityException, InputErrorException {
@@ -110,7 +110,7 @@ public class ChatApiController {
         }
     }
 
-    @MessageMapping("/{id}/read")
+    @MessageMapping("/chats/{id}/read")
     public void read(@DestinationVariable("id") Long chatId)
             throws NoSuchEntityException, InputErrorException, AuthRequiredException {
         chatService.readMessages(chatId);
